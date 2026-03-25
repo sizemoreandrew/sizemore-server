@@ -12,14 +12,8 @@ services:
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
-    env_file:
-      - .env
     environment:
       - HOMEPAGE_ALLOWED_HOSTS=andrewsizemore.tv,dashboard.andrewsizemore.tv,localhost,127.0.0.1,homepage,homepage:3000
-      - HOMEPAGE_VAR_JELLYSEERR_API_KEY=${JELLYSEERR_API_KEY}
-      - HOMEPAGE_VAR_RADARR_API_KEY=${RADARR_API_KEY}
-      - HOMEPAGE_VAR_SONARR_API_KEY=${SONARR_API_KEY}
-      - HOMEPAGE_VAR_QBITTORRENT_PASSWORD=${QBITTORRENT_PASSWORD}
     ports:
       - "3001:3000"
     volumes:
@@ -97,6 +91,35 @@ services:
       - "5055:5055"
     volumes:
       - ./jellyseerr-config:/app/config
+    restart: unless-stopped
+
+  wordpress-db:
+    image: mariadb:11
+    container_name: wordpress-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=${WORDPRESS_DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_USER=wordpress
+      - MYSQL_PASSWORD=${WORDPRESS_DB_PASSWORD}
+    volumes:
+      - ./wordpress-db:/var/lib/mysql
+    restart: unless-stopped
+
+  wordpress:
+    image: wordpress:latest
+    container_name: wordpress
+    depends_on:
+      - wordpress-db
+    ports:
+      - "8082:80"
+    environment:
+      - WORDPRESS_DB_HOST=wordpress-db
+      - WORDPRESS_DB_NAME=wordpress
+      - WORDPRESS_DB_USER=wordpress
+      - WORDPRESS_DB_PASSWORD=${WORDPRESS_DB_PASSWORD}
+      - WORDPRESS_CONFIG_EXTRA=define('WP_HOME','https://blog.andrewsizemore.tv');define('WP_SITEURL','https://blog.andrewsizemore.tv');
+    volumes:
+      - ./wordpress-data:/var/www/html
     restart: unless-stopped
 
   prometheus:

@@ -13,4 +13,10 @@ ingress:
   - hostname: streaming.andrewsizemore.tv
     service: http://10.0.0.142:8096
 
+  - hostname: homepage.andrewsizemore.tv
+    service: http://localhost:80
+
+  - hostname: blog.andrewsizemore.tv
+    service: http://localhost:8082
+
   - service: http_status:404
