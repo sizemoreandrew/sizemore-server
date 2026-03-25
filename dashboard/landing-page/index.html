@@ -3,8 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Andrew Sizemore Portal</title>
+  <title>Andrew Sizemore</title>
   <style>
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
@@ -16,42 +17,63 @@
     }
     .card {
       background: #111827;
-      padding: 40px;
+      padding: 48px 40px;
       border-radius: 20px;
-      width: min(700px, 90vw);
+      width: min(760px, 92vw);
       box-shadow: 0 20px 60px rgba(0,0,0,.4);
       text-align: center;
     }
-    h1 { margin-top: 0; }
-    .buttons {
-      display: flex;
-      justify-content: center;
+    h1 { margin: 0 0 6px; font-size: 2rem; }
+    .subtitle { margin: 0 0 36px; color: #94a3b8; font-size: 0.95rem; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       gap: 16px;
-      flex-wrap: wrap;
-      margin-top: 24px;
     }
-    a {
+    .tile {
       text-decoration: none;
       color: white;
-      padding: 14px 22px;
-      border-radius: 12px;
-      font-weight: bold;
-      background: #2563eb;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.15s, border-color 0.15s;
     }
-    a.purple  { background: #7c3aed; }
-    a.green   { background: #059669; }
-    a.rose    { background: #e11d48; }
+    .tile:hover { background: #273549; border-color: #4f6f8f; }
+    .tile .icon { font-size: 2rem; }
+    .tile .label { font-weight: bold; font-size: 1rem; }
+    .tile .desc { font-size: 0.78rem; color: #94a3b8; }
   </style>
 </head>
 <body>
   <div class="card">
     <h1>Andrew Sizemore</h1>
-    <p>Choose where you want to go.</p>
-    <div class="buttons">
-      <a href="https://streaming.andrewsizemore.tv">Streaming</a>
-      <a class="purple" href="https://request.andrewsizemore.tv">Requests</a>
-      <a class="green" href="https://dashboard.andrewsizemore.tv">Dashboard</a>
-      <a class="rose" href="https://blog.andrewsizemore.tv">Blog</a>
+    <p class="subtitle">andrewsizemore.tv</p>
+    <div class="grid">
+      <a class="tile" href="https://streaming.andrewsizemore.tv">
+        <span class="icon">🎬</span>
+        <span class="label">Watch</span>
+        <span class="desc">Stream movies &amp; TV</span>
+      </a>
+      <a class="tile" href="https://request.andrewsizemore.tv">
+        <span class="icon">📋</span>
+        <span class="label">Requests</span>
+        <span class="desc">Request new media</span>
+      </a>
+      <a class="tile" href="https://dashboard.andrewsizemore.tv">
+        <span class="icon">⚙️</span>
+        <span class="label">Dashboard</span>
+        <span class="desc">Server admin &amp; stats</span>
+      </a>
+      <a class="tile" href="https://blog.andrewsizemore.tv">
+        <span class="icon">✍️</span>
+        <span class="label">Blog</span>
+        <span class="desc">Thoughts &amp; updates</span>
+      </a>
     </div>
   </div>
 </body>
