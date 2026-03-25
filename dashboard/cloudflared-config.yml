@@ -25,4 +25,7 @@ ingress:
   - hostname: randomcard.andrewsizemore.tv
     service: http://localhost:8084
 
+  - hostname: poll.andrewsizemore.tv
+    service: http://localhost:8085
+
   - service: http_status:404

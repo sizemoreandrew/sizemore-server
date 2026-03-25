@@ -93,6 +93,18 @@ services:
       - ./jellyseerr-config:/app/config
     restart: unless-stopped
 
+  polls:
+    build: ./polls
+    container_name: polls
+    ports:
+      - "8085:8085"
+    environment:
+      - SECRET_KEY=${POLLS_SECRET_KEY}
+      - ADMIN_PASSWORD=${POLLS_ADMIN_PASSWORD}
+    volumes:
+      - ./polls-data:/data
+    restart: unless-stopped
+
   randomcard:
     image: nginx:alpine
     container_name: randomcard

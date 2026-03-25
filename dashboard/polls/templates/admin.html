@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Poll Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #080503; --surface: #130c06; --card: #1c1208; --border: #3a2510;
+      --gold: #c9a96e; --gold-dim: #8a6e42; --amber: #e8813a;
+      --parchment: #e8d5b0; --muted: #9a8060;
+    }
+    body { background: var(--bg); color: var(--parchment); font-family: 'Lora', serif; min-height: 100vh; padding: 32px 24px; }
+    h1 { font-family: 'Cinzel', serif; color: var(--gold); font-size: 1.5rem; margin-bottom: 4px; }
+    h2 { font-family: 'Cinzel', serif; color: var(--gold); font-size: 1rem; margin-bottom: 16px; }
+    .nav { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
+    .nav a { color: var(--muted); text-decoration: none; font-size: 0.88rem; }
+    .nav a:hover { color: var(--gold); }
+
+    /* Login */
+    .login-card { max-width: 400px; margin: 80px auto; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 40px; text-align: center; }
+    .login-card h1 { margin-bottom: 24px; }
+    .error { color: #e8503a; font-size: 0.88rem; margin-bottom: 16px; }
+
+    /* Form elements */
+    input, textarea, select {
+      width: 100%; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--parchment); font-family: 'Lora', serif;
+      font-size: 0.9rem; padding: 10px 14px; outline: none;
+      transition: border-color 0.2s; margin-bottom: 0;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--gold-dim); }
+    input::placeholder, textarea::placeholder { color: var(--muted); }
+    input[type=password] { margin-bottom: 12px; }
+    select { cursor: pointer; }
+    select option { background: var(--surface); }
+    textarea { resize: vertical; min-height: 60px; }
+    label { display: block; font-family: 'Cinzel', serif; font-size: 0.75rem; color: var(--gold-dim); letter-spacing: 0.08em; margin-bottom: 6px; }
+    .form-group { margin-bottom: 16px; }
+
+    button, .btn {
+      background: linear-gradient(135deg, #3a2008, #5a3010); border: 1px solid var(--gold-dim);
+      border-radius: 8px; color: var(--gold); font-family: 'Cinzel', serif;
+      font-size: 0.85rem; letter-spacing: 0.06em; padding: 10px 20px; cursor: pointer;
+      transition: background 0.2s; text-decoration: none; display: inline-block;
+    }
+    button:hover { background: linear-gradient(135deg, #4a2a0a, #6a4020); }
+    button.danger { background: #3a0808; border-color: #8a3030; color: #e87070; }
+    button.danger:hover { background: #4a1010; }
+    button.secondary { background: var(--surface); border-color: var(--border); color: var(--muted); }
+    button.secondary:hover { border-color: var(--gold-dim); color: var(--parchment); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Sections */
+    .section { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 24px; }
+
+    /* Options builder */
+    .options-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+    .option-row { display: flex; gap: 8px; }
+    .option-row input { flex: 1; margin-bottom: 0; }
+    .option-row button { padding: 8px 12px; flex-shrink: 0; }
+
+    /* Poll cards in admin */
+    .poll-admin-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 16px; }
+    .poll-admin-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+    .poll-admin-title { font-family: 'Cinzel', serif; font-size: 0.95rem; color: var(--parchment); }
+    .poll-admin-meta { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+    .poll-actions { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
+
+    .badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+    .badge { font-family:'Cinzel',serif; font-size:0.68rem; letter-spacing:0.06em; padding:2px 9px; border-radius:20px; border:1px solid; }
+    .badge-single   { color:#60a5fa; border-color:#1e3a5f; background:#0f1f35; }
+    .badge-multiple { color:#a78bfa; border-color:#3b2a6a; background:#1a1235; }
+    .badge-text     { color:#34d399; border-color:#1a4a37; background:#0a2520; }
+    .badge-open     { color:#34d399; border-color:#1a4a37; background:#0a2520; }
+    .badge-closed   { color:var(--muted); border-color:var(--border); background:var(--bg); }
+
+    /* Results bars */
+    .result-row { margin-bottom: 10px; }
+    .result-label { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px; }
+    .bar-track { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .bar-fill { height: 100%; background: linear-gradient(90deg, var(--gold-dim), var(--amber)); border-radius: 3px; }
+    .text-responses { display: flex; flex-direction: column; gap: 8px; }
+    .text-response { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; font-size: 0.85rem; font-style: italic; }
+    .text-response-meta { font-size: 0.75rem; color: var(--muted); margin-top: 4px; font-style: normal; }
+    .total-note { font-size: 0.78rem; color: var(--muted); font-style: italic; margin-top: 8px; }
+
+    .type-hint { font-size: 0.78rem; color: var(--muted); font-style: italic; margin-top: 4px; }
+  </style>
+</head>
+<body>
+
+{% if not logged_in %}
+<div class="login-card">
+  <h1>🗳️ Admin</h1>
+  <p style="color:var(--muted);font-style:italic;margin-bottom:24px;font-size:0.9rem">Enter the password to manage polls.</p>
+  {% if error %}<div class="error">{{ error }}</div>{% endif %}
+  <form method="POST">
+    <input type="password" name="password" placeholder="Password" autofocus>
+    <button type="submit" style="width:100%;margin-top:4px">Enter</button>
+  </form>
+</div>
+
+{% else %}
+<div class="nav">
+  <h1>🗳️ Poll Admin</h1>
+  <a href="/" style="margin-left:auto">← View Site</a>
+  <a href="/admin/logout">Logout</a>
+</div>
+
+<!-- Create Poll -->
+<div class="section">
+  <h2>✦ Create New Poll</h2>
+
+  <div class="form-group">
+    <label>Poll Type</label>
+    <select id="pollType" onchange="onTypeChange()">
+      <option value="single">Single Choice — one answer from a list</option>
+      <option value="multiple">Multiple Choice — any number of answers from a list</option>
+      <option value="text">Text Response — free-form written answers</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>Question / Title</label>
+    <input type="text" id="pollTitle" placeholder="What do you want to ask?">
+  </div>
+
+  <div class="form-group">
+    <label>Description (optional)</label>
+    <input type="text" id="pollDesc" placeholder="Extra context if needed…">
+  </div>
+
+  <div id="optionsSection" class="form-group">
+    <label>Options</label>
+    <div class="options-list" id="optionsList">
+      <div class="option-row"><input type="text" placeholder="Option 1"><button class="danger" onclick="removeOption(this)" style="padding:8px 10px">✕</button></div>
+      <div class="option-row"><input type="text" placeholder="Option 2"><button class="danger" onclick="removeOption(this)" style="padding:8px 10px">✕</button></div>
+    </div>
+    <button class="secondary" onclick="addOption()" style="padding:7px 14px;font-size:0.8rem">+ Add Option</button>
+  </div>
+  <div id="textHint" class="type-hint" style="display:none">Voters will type a free-text response. No options needed.</div>
+
+  <div class="form-group">
+    <label>Expiry (optional)</label>
+    <select id="expiryPreset" onchange="onExpiryChange()">
+      <option value="">No expiry</option>
+      <option value="1h">1 hour</option>
+      <option value="6h">6 hours</option>
+      <option value="24h">24 hours</option>
+      <option value="3d">3 days</option>
+      <option value="7d">7 days</option>
+      <option value="custom">Custom date & time…</option>
+    </select>
+  </div>
+  <div id="customExpiry" class="form-group" style="display:none">
+    <label>Custom Expiry (UTC)</label>
+    <input type="datetime-local" id="expiryInput">
+  </div>
+
+  <button onclick="createPoll()" id="createBtn">✦ Publish Poll</button>
+</div>
+
+<!-- All Polls -->
+<div class="section">
+  <h2>✦ All Polls <span style="color:var(--muted);font-size:0.8rem;font-weight:normal">({{ polls|length }})</span></h2>
+
+  {% if polls %}
+    {% for poll in polls %}
+    <div class="poll-admin-card" id="pc-{{ poll.id }}">
+      <div class="poll-admin-header">
+        <div>
+          <div class="poll-admin-title">{{ poll.title }}</div>
+          {% if poll.description %}<div class="poll-admin-meta">{{ poll.description }}</div>{% endif %}
+          <div class="poll-admin-meta">Created {{ poll.created_at[:10] }}{% if poll.expires_at %} · Expires {{ poll.expires_at[:10] }}{% endif %}</div>
+        </div>
+        <div class="poll-actions">
+          <a class="btn" href="/poll/{{ poll.id }}" target="_blank" style="padding:7px 14px;font-size:0.78rem">View</a>
+          {% if not poll.expired %}
+            <button class="secondary" onclick="closePoll({{ poll.id }})" style="padding:7px 14px;font-size:0.78rem">Close</button>
+          {% else %}
+            <button class="secondary" onclick="reopenPoll({{ poll.id }})" style="padding:7px 14px;font-size:0.78rem">Reopen</button>
+          {% endif %}
+          <button class="danger" onclick="deletePoll({{ poll.id }})" style="padding:7px 14px;font-size:0.78rem">Delete</button>
+        </div>
+      </div>
+
+      <div class="badges">
+        {% if poll.expired %}<span class="badge badge-closed">● CLOSED</span>
+        {% else %}<span class="badge badge-open">● OPEN</span>{% endif %}
+        <span class="badge badge-{{ poll.type }}">{{ poll.type | upper }}</span>
+      </div>
+
+      <!-- Results -->
+      {% if poll.type == 'text' %}
+        <div class="text-responses">
+          {% if poll.results.responses %}
+            {% for r in poll.results.responses %}
+            <div class="text-response">"{{ r.choice }}"<div class="text-response-meta">{{ r.created_at[:10] }}</div></div>
+            {% endfor %}
+          {% else %}
+            <div style="color:var(--muted);font-style:italic;font-size:0.85rem">No responses yet.</div>
+          {% endif %}
+        </div>
+        <div class="total-note">{{ poll.results.total }} response{{ 's' if poll.results.total != 1 else '' }}</div>
+      {% else %}
+        {% set total = poll.results.total %}
+        {% for opt, count in poll.results.options.items() %}
+        <div class="result-row">
+          <div class="result-label">
+            <span>{{ opt }}</span>
+            <span style="color:var(--gold-dim)">{{ count }}{% if total > 0 %} · {{ (count/total*100)|round|int }}%{% endif %}</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width:{{ (count/total*100)|round|int if total > 0 else 0 }}%"></div></div>
+        </div>
+        {% endfor %}
+        <div class="total-note">{{ total }} vote{{ 's' if total != 1 else '' }} total</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  {% else %}
+    <p style="color:var(--muted);font-style:italic">No polls yet.</p>
+  {% endif %}
+</div>
+
+<script>
+  function onTypeChange() {
+    const type = document.getElementById('pollType').value;
+    const isText = type === 'text';
+    document.getElementById('optionsSection').style.display = isText ? 'none' : '';
+    document.getElementById('textHint').style.display = isText ? 'block' : 'none';
+  }
+
+  function addOption() {
+    const list = document.getElementById('optionsList');
+    const n = list.children.length + 1;
+    const row = document.createElement('div');
+    row.className = 'option-row';
+    row.innerHTML = `<input type="text" placeholder="Option ${n}"><button class="danger" onclick="removeOption(this)" style="padding:8px 10px">✕</button>`;
+    list.appendChild(row);
+  }
+
+  function removeOption(btn) {
+    const list = document.getElementById('optionsList');
+    if (list.children.length > 1) btn.parentElement.remove();
+  }
+
+  function onExpiryChange() {
+    const v = document.getElementById('expiryPreset').value;
+    document.getElementById('customExpiry').style.display = v === 'custom' ? '' : 'none';
+  }
+
+  function getExpiresAt() {
+    const preset = document.getElementById('expiryPreset').value;
+    if (!preset) return null;
+    if (preset === 'custom') {
+      const v = document.getElementById('expiryInput').value;
+      return v ? new Date(v).toISOString().slice(0,19) : null;
+    }
+    const now = new Date();
+    const map = { '1h': 1, '6h': 6, '24h': 24, '3d': 72, '7d': 168 };
+    now.setHours(now.getHours() + (map[preset] || 0));
+    return now.toISOString().slice(0,19);
+  }
+
+  async function createPoll() {
+    const btn = document.getElementById('createBtn');
+    const title = document.getElementById('pollTitle').value.trim();
+    if (!title) { alert('Please enter a question.'); return; }
+    const type = document.getElementById('pollType').value;
+    let options = [];
+    if (type !== 'text') {
+      options = [...document.querySelectorAll('#optionsList .option-row input')]
+        .map(i => i.value.trim()).filter(Boolean);
+      if (options.length < 2) { alert('Add at least 2 options.'); return; }
+    }
+    btn.disabled = true;
+    const res = await fetch('/admin/create', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        title, type, options,
+        description: document.getElementById('pollDesc').value.trim(),
+        expires_at: getExpiresAt()
+      })
+    });
+    if (res.ok) location.reload();
+    else { alert('Error creating poll'); btn.disabled = false; }
+  }
+
+  async function closePoll(id) {
+    await fetch(`/admin/close/${id}`, {method:'POST'});
+    location.reload();
+  }
+
+  async function reopenPoll(id) {
+    await fetch(`/admin/reopen/${id}`, {method:'POST'});
+    location.reload();
+  }
+
+  async function deletePoll(id) {
+    if (!confirm('Delete this poll and all its votes?')) return;
+    await fetch(`/admin/delete/${id}`, {method:'POST'});
+    document.getElementById(`pc-${id}`).remove();
+  }
+</script>
+{% endif %}
+</body>
+</html>
