@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Library Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #080503; --surface: #130c06; --card: #1c1208; --border: #3a2510;
+      --gold: #c9a96e; --gold-dim: #8a6e42; --amber: #e8813a;
+      --parchment: #e8d5b0; --muted: #9a8060;
+    }
+    body { background: var(--bg); color: var(--parchment); font-family: 'Lora', serif; min-height: 100vh; padding: 32px 24px; }
+    h1 { font-family: 'Cinzel', serif; color: var(--gold); font-size: 1.6rem; margin-bottom: 8px; }
+    h2 { font-family: 'Cinzel', serif; color: var(--gold); font-size: 1.1rem; margin-bottom: 16px; letter-spacing: 0.05em; }
+    .subtitle { color: var(--muted); font-style: italic; margin-bottom: 32px; font-size: 0.9rem; }
+    .login-card { max-width: 400px; margin: 80px auto; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 40px; text-align: center; }
+    .login-card h1 { margin-bottom: 24px; }
+    .error { color: #e8503a; font-size: 0.88rem; margin-bottom: 16px; }
+    input[type=password], input[type=text], textarea {
+      width: 100%; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--parchment); font-family: 'Lora', serif;
+      font-size: 0.9rem; padding: 10px 14px; outline: none; margin-bottom: 12px;
+    }
+    input:focus, textarea:focus { border-color: var(--gold-dim); }
+    input::placeholder, textarea::placeholder { color: var(--muted); }
+    textarea { resize: vertical; }
+    button, .btn {
+      background: linear-gradient(135deg, #3a2008, #5a3010); border: 1px solid var(--gold-dim);
+      border-radius: 8px; color: var(--gold); font-family: 'Cinzel', serif;
+      font-size: 0.88rem; letter-spacing: 0.06em; padding: 10px 20px; cursor: pointer;
+      transition: background 0.2s; text-decoration: none; display: inline-block;
+    }
+    button:hover, .btn:hover { background: linear-gradient(135deg, #4a2a0a, #6a4020); }
+    button.danger { background: #3a0808; border-color: #8a3030; color: #e87070; }
+    button.danger:hover { background: #4a1010; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .section { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 28px; }
+    .search-wrap { position: relative; margin-bottom: 12px; }
+    .search-results { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #1c1208; border: 1px solid var(--border); border-radius: 8px; z-index: 100; max-height: 260px; overflow-y: auto; display: none; }
+    .search-results.open { display: block; }
+    .search-result-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; cursor: pointer; border-bottom: 1px solid var(--border); }
+    .search-result-item:hover { background: #2a1a08; }
+    .search-result-item img { width: 30px; height: 44px; object-fit: cover; border-radius: 2px; }
+    .selected-book { display: none; background: var(--surface); border: 1px solid var(--gold-dim); border-radius: 8px; padding: 12px; margin-bottom: 12px; flex-direction: row; gap: 12px; align-items: center; }
+    .selected-book.show { display: flex; }
+    .selected-book img { width: 40px; height: 58px; object-fit: cover; border-radius: 3px; }
+    .book-list { display: flex; flex-direction: column; gap: 12px; }
+    .book-row { display: flex; align-items: center; gap: 14px; padding: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+    .book-row img { width: 36px; height: 52px; object-fit: cover; border-radius: 3px; background: #2a1a08; }
+    .book-row-info { flex: 1; min-width: 0; }
+    .book-row-title { font-family: 'Cinzel', serif; font-size: 0.88rem; color: var(--parchment); }
+    .book-row-author { font-size: 0.8rem; color: var(--muted); }
+    .book-row-note { font-size: 0.8rem; font-style: italic; color: var(--parchment); opacity: 0.7; margin-top: 4px; }
+    .book-row-from { font-size: 0.78rem; color: var(--amber); }
+    .nav { display: flex; gap: 12px; margin-bottom: 28px; align-items: center; }
+    .nav a { color: var(--muted); text-decoration: none; font-size: 0.88rem; }
+    .nav a:hover { color: var(--gold); }
+    .badge { background: #3a1a08; color: var(--amber); font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; font-family: 'Cinzel', serif; }
+  </style>
+</head>
+<body>
+
+{% if not logged_in %}
+<div class="login-card">
+  <h1>🔮 Admin</h1>
+  <p style="color:var(--muted);font-style:italic;margin-bottom:24px;font-size:0.9rem">Speak the word, Archmage.</p>
+  {% if error %}<div class="error">{{ error }}</div>{% endif %}
+  <form method="POST">
+    <input type="password" name="password" placeholder="Password" autofocus>
+    <button type="submit" style="width:100%">Enter</button>
+  </form>
+</div>
+
+{% else %}
+<div class="nav">
+  <h1>🔮 Library Admin</h1>
+  <a href="/" style="margin-left:auto">← View Site</a>
+  <a href="/admin/logout">Logout</a>
+</div>
+
+<!-- Add a book -->
+<div class="section">
+  <h2>✦ Add to Your Shelf</h2>
+  <div class="search-wrap">
+    <input type="text" id="bookSearch" placeholder="Search for a book…" autocomplete="off">
+    <div class="search-results" id="searchResults"></div>
+  </div>
+  <div class="selected-book" id="selectedBook">
+    <img id="selCover" src="" alt="">
+    <div style="flex:1">
+      <div id="selTitle" style="font-family:'Cinzel',serif;font-size:0.9rem;color:var(--parchment)"></div>
+      <div id="selAuthor" style="font-size:0.82rem;color:var(--gold-dim);margin-top:3px"></div>
+    </div>
+    <button class="danger" id="clearBook" style="padding:6px 12px;font-size:0.8rem">✕</button>
+  </div>
+  <textarea id="noteInput" rows="2" placeholder="Your note about this book (optional)…"></textarea>
+  <button id="addBtn" disabled>+ Add to Shelf</button>
+</div>
+
+<!-- Andrew's recs -->
+<div class="section">
+  <h2>📖 Your Shelf <span class="badge">{{ andrew_recs|length }}</span></h2>
+  {% if andrew_recs %}
+  <div class="book-list">
+    {% for book in andrew_recs %}
+    <div class="book-row" id="ar-{{ book.id }}">
+      {% if book.cover_url %}<img src="{{ book.cover_url }}" alt="">{% else %}<div style="width:36px;height:52px;background:#2a1a08;border-radius:3px;display:flex;align-items:center;justify-content:center">📚</div>{% endif %}
+      <div class="book-row-info">
+        <div class="book-row-title">{{ book.title }}</div>
+        <div class="book-row-author">{{ book.author }}{% if book.year %} · {{ book.year }}{% endif %}</div>
+        {% if book.note %}<div class="book-row-note">"{{ book.note }}"</div>{% endif %}
+      </div>
+      <button class="danger" onclick="deleteRec({{ book.id }}, 'andrew_recs', 'ar-{{ book.id }}')">Remove</button>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p style="color:var(--muted);font-style:italic">No books yet.</p>
+  {% endif %}
+</div>
+
+<!-- User recs -->
+<div class="section">
+  <h2>📜 Scrolls Received <span class="badge">{{ user_recs|length }}</span></h2>
+  {% if user_recs %}
+  <div class="book-list">
+    {% for book in user_recs %}
+    <div class="book-row" id="ur-{{ book.id }}">
+      {% if book.cover_url %}<img src="{{ book.cover_url }}" alt="">{% else %}<div style="width:36px;height:52px;background:#2a1a08;border-radius:3px;display:flex;align-items:center;justify-content:center">📜</div>{% endif %}
+      <div class="book-row-info">
+        <div class="book-row-title">{{ book.title }}</div>
+        <div class="book-row-author">{{ book.author }}{% if book.year %} · {{ book.year }}{% endif %}</div>
+        <div class="book-row-from">From: {{ book.recommended_by }}</div>
+        {% if book.message %}<div class="book-row-note">"{{ book.message }}"</div>{% endif %}
+      </div>
+      <button class="danger" onclick="deleteRec({{ book.id }}, 'user_recs', 'ur-{{ book.id }}')">Dismiss</button>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p style="color:var(--muted);font-style:italic">No scrolls yet.</p>
+  {% endif %}
+</div>
+
+<script>
+  let selectedBookData = null;
+  let searchTimer = null;
+  const bookSearch = document.getElementById('bookSearch');
+  const searchResults = document.getElementById('searchResults');
+  const selectedBook = document.getElementById('selectedBook');
+  const addBtn = document.getElementById('addBtn');
+
+  bookSearch.addEventListener('input', () => {
+    clearTimeout(searchTimer);
+    const q = bookSearch.value.trim();
+    if (q.length < 2) { searchResults.classList.remove('open'); return; }
+    searchTimer = setTimeout(() => doSearch(q), 400);
+  });
+
+  async function doSearch(q) {
+    const res = await fetch('/api/books/search?q=' + encodeURIComponent(q));
+    const books = await res.json();
+    searchResults.innerHTML = '';
+    if (!books.length) { searchResults.classList.remove('open'); return; }
+    books.forEach(b => {
+      const el = document.createElement('div');
+      el.className = 'search-result-item';
+      el.innerHTML = `<img src="${b.cover_url||''}" alt="" onerror="this.style.display='none'"><div><div style="font-size:.88rem;color:var(--parchment)">${b.title}</div><div style="font-size:.78rem;color:var(--muted)">${b.author}${b.year?' · '+b.year:''}</div></div>`;
+      el.addEventListener('click', () => {
+        selectedBookData = b;
+        document.getElementById('selTitle').textContent = b.title;
+        document.getElementById('selAuthor').textContent = b.author + (b.year?' · '+b.year:'');
+        const img = document.getElementById('selCover');
+        img.src = b.cover_url||''; img.style.display = b.cover_url?'':'none';
+        selectedBook.classList.add('show');
+        searchResults.classList.remove('open');
+        bookSearch.value = '';
+        addBtn.disabled = false;
+      });
+      searchResults.appendChild(el);
+    });
+    searchResults.classList.add('open');
+  }
+
+  document.getElementById('clearBook').addEventListener('click', () => {
+    selectedBookData = null;
+    selectedBook.classList.remove('show');
+    addBtn.disabled = true;
+  });
+
+  document.addEventListener('click', e => {
+    if (!bookSearch.contains(e.target) && !searchResults.contains(e.target))
+      searchResults.classList.remove('open');
+  });
+
+  addBtn.addEventListener('click', async () => {
+    if (!selectedBookData) return;
+    addBtn.disabled = true;
+    const res = await fetch('/admin/add', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({...selectedBookData, note: document.getElementById('noteInput').value.trim()})
+    });
+    if (res.ok) location.reload();
+    else { alert('Error adding book'); addBtn.disabled = false; }
+  });
+
+  async function deleteRec(id, table, rowId) {
+    if (!confirm('Remove this entry?')) return;
+    const res = await fetch(`/admin/delete/${id}?table=${table}`, {method:'POST'});
+    if (res.ok) document.getElementById(rowId).remove();
+    else alert('Error deleting');
+  }
+</script>
+{% endif %}
+
+</body>
+</html>

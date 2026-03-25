@@ -93,6 +93,18 @@ services:
       - ./jellyseerr-config:/app/config
     restart: unless-stopped
 
+  bookrecs:
+    build: ./bookrecs
+    container_name: bookrecs
+    ports:
+      - "8083:8083"
+    environment:
+      - SECRET_KEY=${BOOKRECS_SECRET_KEY}
+      - ADMIN_PASSWORD=${BOOKRECS_ADMIN_PASSWORD}
+    volumes:
+      - ./bookrecs-data:/data
+    restart: unless-stopped
+
   wordpress-db:
     image: mariadb:11
     container_name: wordpress-db
