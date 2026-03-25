@@ -75,9 +75,11 @@
       background: linear-gradient(180deg, #0f0804 0%, transparent 100%);
     }
     .tower-ornament {
-      font-size: 2.8rem;
       display: block;
-      margin-bottom: 12px;
+      margin: 0 auto 12px;
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
       filter: drop-shadow(0 0 12px rgba(201,169,110,0.6));
     }
     header h1 {
@@ -388,7 +390,7 @@
   <div id="stars"></div>
 
   <header>
-    <span class="tower-ornament">🧙</span>
+    <img class="tower-ornament" src="/static/wizard_hat.png" alt="Wizard Hat">
     <h1>The Archmage's Library</h1>
     <p>A tome of literary recommendations, curated and collected.</p>
     <div class="divider"></div>
