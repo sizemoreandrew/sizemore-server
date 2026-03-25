@@ -36,34 +36,30 @@
       position: relative;
       width: min(340px, 86vw);
       aspect-ratio: 63 / 88;
-      perspective: 1000px;
     }
 
-    .card-inner {
+    .card-display {
       width: 100%;
       height: 100%;
-      position: relative;
-      transform-style: preserve-3d;
-      transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .card-inner.flip { transform: rotateY(180deg); }
-
-    .card-face {
-      position: absolute;
-      inset: 0;
-      backface-visibility: hidden;
       border-radius: 4.75% / 3.4%;
       overflow: hidden;
       box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 20px 60px rgba(0,0,0,0.8);
     }
-    .card-face.back { transform: rotateY(180deg); }
 
-    .card-face img {
+    .card-display img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
       border-radius: inherit;
+    }
+
+    @keyframes cardReveal {
+      0%   { opacity: 0; transform: scale(0.92); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .card-display.reveal {
+      animation: cardReveal 0.4s cubic-bezier(0.2, 0, 0.2, 1) forwards;
     }
 
     .card-placeholder {
@@ -166,14 +162,11 @@
   <h1>✦ Draw a Card ✦</h1>
 
   <div class="card-stage">
-    <div class="card-inner" id="cardInner">
-      <div class="card-face front" id="cardFront">
-        <div class="card-placeholder">
-          <span class="mtg-icon">🃏</span>
-          <p>AWAITING YOUR DRAW</p>
-        </div>
+    <div class="card-display" id="cardDisplay">
+      <div class="card-placeholder">
+        <span class="mtg-icon">🃏</span>
+        <p>AWAITING YOUR DRAW</p>
       </div>
-      <div class="card-face back" id="cardBack"></div>
     </div>
     <div class="loading-overlay" id="loadingOverlay"></div>
   </div>
@@ -193,7 +186,6 @@
   <script>
     let cardFaces = [];
     let currentFace = 0;
-    let flipped = false;
 
     async function drawCard() {
       const btn = document.getElementById('drawBtn');
@@ -208,7 +200,6 @@
         const res = await fetch('https://api.scryfall.com/cards/random');
         const card = await res.json();
 
-        // Gather image(s)
         if (card.card_faces && card.card_faces[0].image_uris) {
           cardFaces = card.card_faces.map(f => f.image_uris.large || f.image_uris.normal);
           document.getElementById('face0Btn').textContent = card.card_faces[0].name || 'Front';
@@ -219,36 +210,27 @@
         }
 
         currentFace = 0;
-        renderFace(0);
+        overlay.classList.remove('show');
+        showImage(cardFaces[0]);
 
-        // Info
         document.getElementById('cardName').textContent = card.name;
         const parts = [card.type_line, card.set_name, card.released_at?.slice(0,4)].filter(Boolean);
         document.getElementById('cardMeta').textContent = parts.join(' · ');
 
       } catch (e) {
+        overlay.classList.remove('show');
         document.getElementById('cardName').textContent = 'Failed to draw — try again';
       }
 
-      overlay.classList.remove('show');
       btn.disabled = false;
     }
 
-    function renderFace(index) {
-      const src = cardFaces[index];
-      if (!src) return;
-      const img = new Image();
-      img.onload = () => {
-        const front = document.getElementById('cardFront');
-        front.innerHTML = `<img src="${src}" alt="MTG Card">`;
-        // Flip trick: reset then reflip to trigger animation
-        const inner = document.getElementById('cardInner');
-        inner.classList.remove('flip');
-        void inner.offsetWidth; // reflow
-        inner.classList.add('flip');
-        flipped = true;
-      };
-      img.src = src;
+    function showImage(src) {
+      const display = document.getElementById('cardDisplay');
+      display.classList.remove('reveal');
+      display.innerHTML = `<img src="${src}" alt="MTG Card">`;
+      void display.offsetWidth;
+      display.classList.add('reveal');
     }
 
     function showFace(index) {
@@ -256,9 +238,7 @@
       document.querySelectorAll('.face-btn').forEach((b, i) =>
         b.classList.toggle('active', i === index)
       );
-      const src = cardFaces[index];
-      const front = document.getElementById('cardFront');
-      front.innerHTML = `<img src="${src}" alt="MTG Card">`;
+      showImage(cardFaces[index]);
     }
   </script>
 </body>
