@@ -357,12 +357,25 @@
       border-top: 1px solid var(--border);
       margin: 28px 0;
     }
-    .recs-header {
-      font-family: 'Cinzel', serif;
-      font-size: 0.88rem;
+    .contact-note {
+      font-size: 0.78rem;
       color: var(--muted);
-      letter-spacing: 0.06em;
-      margin-bottom: 16px;
+      font-style: italic;
+      margin-top: 4px;
+    }
+
+    /* ── Community scrolls section ── */
+    .community-section {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 48px 32px;
+    }
+    .community-section .panel-title { margin-bottom: 6px; }
+    .community-section .panel-subtitle { margin-bottom: 28px; }
+    .community-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
     }
 
     /* scrollbar */
@@ -442,33 +455,40 @@
         <label for="message">Why should Andrew read this?</label>
         <textarea id="message" rows="3" placeholder="It changed how I think about…"></textarea>
       </div>
-      <button class="submit-btn" id="submitBtn" disabled>✦ Leave Your Scroll ✦</button>
-
-      <!-- Previous recommendations -->
-      {% if user_recs %}
-      <hr class="section-divider">
-      <div class="recs-header">✦ SCROLLS ALREADY RECEIVED ✦</div>
-      <div class="books">
-        {% for book in user_recs %}
-        <div class="book-card">
-          {% if book.cover_url %}
-            <img class="book-cover" src="{{ book.cover_url }}" alt="{{ book.title }}" loading="lazy">
-          {% else %}
-            <div class="book-cover-placeholder">📜</div>
-          {% endif %}
-          <div class="book-info">
-            <div class="book-title">{{ book.title }}</div>
-            <div class="book-author">{{ book.author }}</div>
-            {% if book.year %}<div class="book-year">{{ book.year }}</div>{% endif %}
-            <div class="book-from">From {{ book.recommended_by }}</div>
-            {% if book.message %}<div class="book-message">"{{ book.message }}"</div>{% endif %}
-          </div>
-        </div>
-        {% endfor %}
+      <div class="form-group">
+        <label for="contactInfo">Contact Info (optional, private — only Andrew sees this)</label>
+        <input type="text" id="contactInfo" placeholder="Email, Instagram, Discord…">
+        <div class="contact-note">🔒 Never shown publicly.</div>
       </div>
-      {% endif %}
+      <button class="submit-btn" id="submitBtn" disabled>✦ Leave Your Scroll ✦</button>
     </div>
   </main>
+
+  <!-- Community scrolls -->
+  {% if user_recs %}
+  <section class="community-section">
+    <div class="panel-title"><span class="icon">📜</span> Scrolls Received</div>
+    <div class="panel-subtitle">Books others have recommended to Andrew.</div>
+    <div class="community-grid">
+      {% for book in user_recs %}
+      <div class="book-card">
+        {% if book.cover_url %}
+          <img class="book-cover" src="{{ book.cover_url }}" alt="{{ book.title }}" loading="lazy">
+        {% else %}
+          <div class="book-cover-placeholder">📜</div>
+        {% endif %}
+        <div class="book-info">
+          <div class="book-title">{{ book.title }}</div>
+          <div class="book-author">{{ book.author }}</div>
+          {% if book.year %}<div class="book-year">{{ book.year }}</div>{% endif %}
+          <div class="book-from">From {{ book.recommended_by }}</div>
+          {% if book.message %}<div class="book-message">"{{ book.message }}"</div>{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
 
   <div class="toast" id="toast"></div>
 
@@ -539,7 +559,8 @@
       const payload = {
         ...selectedBookData,
         recommended_by: document.getElementById('fromName').value.trim(),
-        message: document.getElementById('message').value.trim()
+        message: document.getElementById('message').value.trim(),
+        contact_info: document.getElementById('contactInfo').value.trim()
       };
       const res = await fetch('/api/recommend', {
         method: 'POST',

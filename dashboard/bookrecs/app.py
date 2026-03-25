@@ -37,8 +37,13 @@ def init_db():
         year INTEGER,
         recommended_by TEXT,
         message TEXT,
+        contact_info TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )''')
+    try:
+        conn.execute('ALTER TABLE user_recs ADD COLUMN contact_info TEXT')
+    except Exception:
+        pass
     conn.commit()
     conn.close()
 
@@ -85,9 +90,9 @@ def submit_rec():
         return jsonify({'error': 'title and author required'}), 400
     conn = get_db()
     conn.execute(
-        'INSERT INTO user_recs (title, author, cover_url, ol_key, year, recommended_by, message) VALUES (?,?,?,?,?,?,?)',
+        'INSERT INTO user_recs (title, author, cover_url, ol_key, year, recommended_by, message, contact_info) VALUES (?,?,?,?,?,?,?,?)',
         (data['title'], data['author'], data.get('cover_url'), data.get('ol_key'),
-         data.get('year'), data.get('recommended_by') or 'Anonymous', data.get('message', ''))
+         data.get('year'), data.get('recommended_by') or 'Anonymous', data.get('message', ''), data.get('contact_info', ''))
     )
     conn.commit()
     conn.close()

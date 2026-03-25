@@ -135,6 +135,7 @@
         <div class="book-row-title">{{ book.title }}</div>
         <div class="book-row-author">{{ book.author }}{% if book.year %} · {{ book.year }}{% endif %}</div>
         <div class="book-row-from">From: {{ book.recommended_by }}</div>
+        {% if book.contact_info %}<div class="book-row-note" style="color:var(--amber)">📬 {{ book.contact_info }}</div>{% endif %}
         {% if book.message %}<div class="book-row-note">"{{ book.message }}"</div>{% endif %}
       </div>
       <button class="danger" onclick="deleteRec({{ book.id }}, 'user_recs', 'ur-{{ book.id }}')">Dismiss</button>
