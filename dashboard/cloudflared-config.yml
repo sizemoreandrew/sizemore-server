@@ -22,4 +22,7 @@ ingress:
   - hostname: bookrecs.andrewsizemore.tv
     service: http://localhost:8083
 
+  - hostname: randomcard.andrewsizemore.tv
+    service: http://localhost:8084
+
   - service: http_status:404

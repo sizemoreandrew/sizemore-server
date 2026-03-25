@@ -93,6 +93,15 @@ services:
       - ./jellyseerr-config:/app/config
     restart: unless-stopped
 
+  randomcard:
+    image: nginx:alpine
+    container_name: randomcard
+    ports:
+      - "8084:80"
+    volumes:
+      - ./randomcard:/usr/share/nginx/html:ro
+    restart: unless-stopped
+
   bookrecs:
     build: ./bookrecs
     container_name: bookrecs
