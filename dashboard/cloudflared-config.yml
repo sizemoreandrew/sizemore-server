@@ -1,0 +1,16 @@
+tunnel: eaedcc33-579d-4921-9e10-9833fbad2890
+credentials-file: /etc/cloudflared/eaedcc33-579d-4921-9e10-9833fbad2890.json
+
+ingress:
+  - hostname: dashboard.andrewsizemore.tv
+    service: http://localhost:3001
+
+  - hostname: request.andrewsizemore.tv
+    service: http://localhost:5055
+    originRequest:
+      httpHostHeader: localhost:5055
+
+  - hostname: streaming.andrewsizemore.tv
+    service: http://10.0.0.142:8096
+
+  - service: http_status:404
