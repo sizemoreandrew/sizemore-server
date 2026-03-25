@@ -1,0 +1,101 @@
+- Media:
+    - Jellyseerr:
+        icon: jellyseerr
+        href: http://localhost:5055
+        container: jellyseerr
+        widget:
+          type: jellyseerr
+          url: http://jellyseerr:5055
+          key: "{{HOMEPAGE_VAR_JELLYSEERR_API_KEY}}"
+
+    - Radarr:
+        icon: radarr
+        href: http://localhost:7878
+        container: radarr
+        widget:
+          type: radarr
+          url: http://radarr:7878
+          key: "{{HOMEPAGE_VAR_RADARR_API_KEY}}"
+
+    - Sonarr:
+        icon: sonarr
+        href: http://localhost:8989
+        container: sonarr
+        widget:
+          type: sonarr
+          url: http://sonarr:8989
+          key: "{{HOMEPAGE_VAR_SONARR_API_KEY}}"
+
+- Downloads:
+    - qBittorrent:
+        icon: qbittorrent
+        href: http://localhost:8081
+        container: qbittorrent
+        widget:
+          type: qbittorrent
+          url: http://qbittorrent:8080
+          username: "admin"
+          password: "{{HOMEPAGE_VAR_QBITTORRENT_PASSWORD}}"
+
+- Infrastructure:
+    - Grafana:
+        icon: grafana
+        href: http://localhost:3030
+        container: grafana
+
+    - Prometheus:
+        icon: prometheus
+        href: http://localhost:9090
+        container: prometheus
+
+    - Portainer:
+        icon: portainer
+        href: http://localhost:9000
+        container: portainer
+
+- AI:
+    - Open WebUI:
+        icon: open-webui
+        href: http://localhost:3000
+        container: openwebui
+
+    - Ollama:
+        icon: ollama
+        href: http://localhost:11434
+        container: ollama
+
+- Server 2:
+    - CPU Usage:
+        widget:
+          type: glances
+          url: http://10.0.0.142:61208
+          version: 4
+          metric: cpu
+
+    - Memory Usage:
+        widget:
+          type: glances
+          url: http://10.0.0.142:61208
+          version: 4
+          metric: memory
+
+    - Uptime:
+        widget:
+          type: glances
+          url: http://10.0.0.142:61208
+          version: 4
+          metric: uptime
+
+    - D Drive Free:
+        widget:
+          type: glances
+          url: http://10.0.0.142:61208
+          version: 4
+          metric: fs:D:\
+
+    - C Drive Free:
+        widget:
+          type: glances
+          url: http://10.0.0.142:61208
+          version: 4
+          metric: fs:C:\

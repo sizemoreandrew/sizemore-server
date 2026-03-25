@@ -1,0 +1,10 @@
+tunnel: ${CLOUDFLARED_TUNNEL_ID}
+credentials-file: /home/andrew/.cloudflared/${CLOUDFLARED_TUNNEL_ID}.json
+ingress:
+  - hostname: andrewsizemore.tv
+    service: http://localhost:8088
+  - hostname: request.andrewsizemore.tv
+    service: http://localhost:5055
+  - hostname: streaming.andrewsizemore.tv
+    service: http://localhost:8096
+  - service: http_status:404

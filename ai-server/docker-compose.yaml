@@ -1,0 +1,56 @@
+version: "3.9"
+
+services:
+
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama:/root/.ollama
+    restart: unless-stopped
+
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: openwebui
+    ports:
+      - "3000:8080"
+    volumes:
+      - ./openwebui:/app/backend/data
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+    depends_on:
+      - ollama
+    restart: unless-stopped
+
+  chromadb:
+    image: chromadb/chroma
+    container_name: chromadb
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./chromadb:/chroma/chroma
+    restart: unless-stopped
+
+  portainer:
+    image: portainer/portainer-ce
+    container_name: portainer
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./portainer:/data
+    restart: unless-stopped
+
+  pihole:
+    image: pihole/pihole
+    container_name: pihole
+    ports:
+      - "8080:80"
+    environment:
+      TZ: "America/Los_Angeles"
+      WEBPASSWORD: "${PIHOLE_WEBPASSWORD}"
+    volumes:
+      - ./pihole:/etc/pihole
+    restart: unless-stopped

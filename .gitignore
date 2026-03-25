@@ -1,0 +1,54 @@
+# Large media files
+*.mkv
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flac
+*.mp3
+*.wav
+*.iso
+*.img
+
+# Docker persistent data volumes (large/runtime state)
+ai-server/ollama/
+ai-server/openwebui/
+ai-server/chromadb/
+ai-server/portainer/
+ai-server/pihole/
+ai-server/venv/
+ai-server/piper-voices/
+ai-server/*.wav
+
+dashboard/jellyfin-config/
+dashboard/jellyfin-cache/
+dashboard/bazarr-config/
+dashboard/sonarr-config/
+dashboard/radarr-config/
+dashboard/prowlarr-config/
+dashboard/qbittorrent-config/
+dashboard/qbittorrent-config*/
+dashboard/jellyseerr-config/
+dashboard/overseerr-config/
+dashboard/homepage-config/logs/
+
+# Backup files
+dashboard/*.bak.*
+dashboard/homepage-config/*.bak.*
+
+# Secrets — never commit real values
+.env
+**/.env
+.credentials.json
+*.credentials
+*.secret
+
+# Cloudflared tunnel credential (contains secret)
+ai-server/pihole/
+.cloudflared/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo

@@ -1,0 +1,25 @@
+title: Andrew's Server
+theme: dark
+color: slate
+headerStyle: clean
+statusStyle: dot
+useEqualHeights: true
+
+layout:
+  Media:
+    style: row
+    columns: 4
+  Downloads:
+    style: row
+    columns: 3
+  Infrastructure:
+    style: row
+    columns: 4
+  AI:
+    style: row
+    columns: 3
+
+disableCollapse: true
+groupsInitiallyCollapsed: false
+fullWidth: true
+showStats: true
